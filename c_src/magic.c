@@ -1,8 +1,6 @@
 
 #include <stdio.h>
 #include <magic.h>
-#include <regex.h>
-#include <string.h>
 
 #include "erl_nif.h"
 

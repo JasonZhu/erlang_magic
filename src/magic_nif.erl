@@ -33,6 +33,6 @@ load_nif() ->
 from_file(_FilePath) ->
     ?nif_stub.
 
--spec from_buffer(string()) -> {ok, string()} | {error, string()}.
+-spec from_buffer(binary()) -> {ok, string()} | {error, string()}.
 from_buffer(_Binary) ->
     ?nif_stub.

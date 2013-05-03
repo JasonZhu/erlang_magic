@@ -1,0 +1,12 @@
+{application, erlang_magic,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { erlang_magic_app, []}},
+  {env, []}
+ ]}.

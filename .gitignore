@@ -9,3 +9,4 @@
 *.dump
 *.beam
 *.o
+*.so

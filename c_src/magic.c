@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <magic.h>
-
+#include <string.h>
 #include "erl_nif.h"
 
 #define MAXBUFLEN  1024
@@ -18,7 +18,6 @@ from_file_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
 
     
 
-	const char *magic_full;
     magic_t magic_cookie;
     //MAGIC_MIME tells magic to return a mime of the file, but you can specify different things
     // magic_cookie = magic_open(MAGIC_MIME); 
@@ -35,18 +34,17 @@ from_file_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     }
 
     //
+    const char *magic_full;
     magic_full = magic_file(magic_cookie, buf);
 
     if(magic_full == NULL){
+        magic_close(magic_cookie);
         return enif_make_tuple2(env, errorTerm, enif_make_string(env, magic_error(magic_cookie), ERL_NIF_LATIN1));
     }
-    
-    magic_close(magic_cookie);
 
     ERL_NIF_TERM okTerm = enif_make_atom(env, "ok");
     ERL_NIF_TERM value = enif_make_string(env, magic_full, ERL_NIF_LATIN1);   
-    
-
+    magic_close(magic_cookie);
     return  enif_make_tuple2(env, okTerm, value);
 }
 
@@ -62,7 +60,6 @@ from_buffer_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
         return enif_make_tuple2(env, errorTerm, enif_make_string(env, "badarg", ERL_NIF_LATIN1));
     }
 
-    const char *magic_full;
     magic_t magic_cookie;
     //MAGIC_MIME tells magic to return a mime of the file, but you can specify different things
     // magic_cookie = magic_open(MAGIC_MIME); 
@@ -77,15 +74,18 @@ from_buffer_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
         magic_close(magic_cookie);
         return enif_make_tuple2(env, errorTerm, enif_make_string(env, "magic_load_database_fail", ERL_NIF_LATIN1));
     }
+    
+    const char *magic_full;
     magic_full = magic_buffer(magic_cookie, p.data, p.size);
-    magic_close(magic_cookie);
 
     if(!magic_full){
+        magic_close(magic_cookie);
         return enif_make_tuple2(env, errorTerm, enif_make_string(env, magic_error(magic_cookie), ERL_NIF_LATIN1));
     }
 
     ERL_NIF_TERM okTerm = enif_make_atom(env, "ok");
     ERL_NIF_TERM value = enif_make_string(env, magic_full, ERL_NIF_LATIN1);   
+    magic_close(magic_cookie);
     
     return  enif_make_tuple2(env, okTerm, value);
 }

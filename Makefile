@@ -17,7 +17,7 @@ deps:
 clean:
 	$(REBAR) clean
 
-eunit:
+eunit: all
 	$(REBAR) eunit
 
 test: eunit

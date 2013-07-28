@@ -7,13 +7,16 @@
 #define FLAG_FROM_FILE 0
 #define FLAG_FROM_BUFFER 1
 
+#define TYPE_MAGIC_MIME 0
+#define TYPE_MAGIC_MIME_TYPE 1
+
 
 
 static ERL_NIF_TERM 
 magic_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     ErlNifBinary p;
 
-     if (argc != 2)
+     if (argc != 3)
     {
         return enif_make_badarg(env);
     }
@@ -22,16 +25,27 @@ magic_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
         return enif_make_badarg(env);
     }
 
-     int flag = 0;
+    int flag = 0;
     if (!enif_get_int(env, argv[1], &flag))
+    {
+        return enif_make_badarg(env);
+    }
+
+    int type = 0;
+    if (!enif_get_int(env, argv[2], &type))
     {
         return enif_make_badarg(env);
     }
 
     magic_t magic_cookie;
     //MAGIC_MIME tells magic to return a mime of the file, but you can specify different things
-    // magic_cookie = magic_open(MAGIC_MIME); 
-    magic_cookie = magic_open(MAGIC_MIME_TYPE); 
+    switch(type){
+        case TYPE_MAGIC_MIME:
+            magic_cookie = magic_open(MAGIC_MIME); 
+            break;
+        default:
+            magic_cookie = magic_open(MAGIC_MIME_TYPE); 
+    }
     if (magic_cookie == NULL) {
         return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "fail_to_open_magic"));
     }
@@ -43,10 +57,16 @@ magic_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
         return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "fail_to_load_magic_database"));
     }
     
-    const char *magic_full;
+    const char *magic_full="";
+    char path[p.size+1];
     switch(flag){
         case FLAG_FROM_FILE:
-            magic_full = magic_file(magic_cookie, (const char *)p.data);
+            //TODO 
+            // p.data[p.size] = '\0';
+            // magic_full = magic_file(magic_cookie, (const char *)p.data);
+            memcpy(path, p.data, p.size);
+            path[p.size] = '\0';
+            magic_full = magic_file(magic_cookie, path);
             break;
         case FLAG_FROM_BUFFER:
             magic_full = magic_buffer(magic_cookie, p.data, p.size);
@@ -58,10 +78,19 @@ magic_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
 
     if(!magic_full){
         magic_close(magic_cookie);
-        return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, magic_error(magic_cookie)));
+        return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "fail_to_magic"));
     }
 
-    ERL_NIF_TERM value = enif_make_string(env, magic_full, ERL_NIF_LATIN1);   
+    ErlNifBinary bin;
+    size_t size = strlen(magic_full);
+    if(!enif_alloc_binary(size, &bin))
+    {
+        return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "fail_to_build_binary"));
+    }
+    memcpy(bin.data, magic_full, size);
+
+    // ERL_NIF_TERM value = enif_make_string(env, magic_full, ERL_NIF_LATIN1);   
+    ERL_NIF_TERM value = enif_make_binary(env, &bin);
     magic_close(magic_cookie);
     
     return  enif_make_tuple2(env, enif_make_atom(env, "ok"), value);
@@ -70,7 +99,7 @@ magic_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
 
 
 static ErlNifFunc nif_funcs[] = {
-    {"magic", 2, magic_nif}
+    {"magic", 3, magic_nif}
 };
 
 static int

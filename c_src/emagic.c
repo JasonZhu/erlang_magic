@@ -128,5 +128,5 @@ unload(ErlNifEnv *env, void *priv)
 }
 
 // ERL_NIF_INIT(yfs, nif_funcs, NULL, NULL, NULL, NULL);
-ERL_NIF_INIT(magic, nif_funcs, &load, &reload, &upgrade, &unload);
+ERL_NIF_INIT(emagic, nif_funcs, &load, &reload, &upgrade, &unload);
 

@@ -4,14 +4,14 @@ erlang_magic is a Erlang interface to the libmagic file type identification libr
 
 
 ##Example Usage
-	1> magic:from_file(<<"src/magic.erl">>).
+	1> emagic:from_file(<<"src/emagic.erl">>).
 	{ok,<<"text/plain">>}
-	2> magic:from_file(<<"error_path">>).       
+	2> emagic:from_file(<<"error_path">>).       
 	{error, fail_to_magic}
-	3> {ok, File}=file:open("src/magic.erl", [read, binary]).
+	3> {ok, File}=file:open("src/emagic.erl", [read, binary]).
 	{ok,<0.39.0>}
 	4> {ok, Bin} = file:read(File, 32).
-	{ok,<<"-module(magic_nif).\n\n-export([fr">>}
-	5> magic:from_buffer(Bin).     
+	{ok,<<"-module(emagic).\n\n-export([fr">>}
+	5> emagic:from_buffer(Bin).     
 	{ok,<<"text/plain">>}
 

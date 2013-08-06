@@ -1,4 +1,4 @@
--module(magic).
+-module(emagic).
 
 -export([from_file/1]).
 -export([from_buffer/1]).
@@ -35,7 +35,7 @@ load_nif() ->
           Path ->
               Path
           end,
-    erlang:load_nif(filename:join(PrivDir, "magic"), ?NIF_LOAD_INFO).
+    erlang:load_nif(filename:join(PrivDir, "emagic"), ?NIF_LOAD_INFO).
 
 
 -spec from_file(string() | binary()) -> {ok, binary()} | {error, term()}.

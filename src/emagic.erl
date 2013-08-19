@@ -45,7 +45,7 @@ from_file(FilePath) when is_binary(FilePath) ->
     magic(FilePath, ?FLAG_FROM_FILE).
 
 -spec from_buffer(binary()) -> {ok, binary()} | {error, term()}.
-from_buffer(Binary) ->
+from_buffer(Binary) when is_binary(Binary)->
     magic(Binary, ?FLAG_FROM_BUFFER).
 
 magic(Binary, Flag) when is_binary(Binary), is_integer(Flag)->

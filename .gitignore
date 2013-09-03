@@ -1,0 +1,5 @@
+/ebin
+/.eunit
+.DS_Store
+*.o
+*.so
